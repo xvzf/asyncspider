@@ -1,0 +1,4 @@
+uvloop
+aioredis
+aiohttp
+yarl
