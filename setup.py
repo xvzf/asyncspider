@@ -23,7 +23,7 @@ setup(
     ],
 
     packages=find_packages(exclude=["contrib", "docs", "tests"]),
-    install_requires=["uvloop", "aioredis", "aiohttp", "yarl"],
+    install_requires=["uvloop", "aioredis", "aiohttp", "yarl", "click"],
 
     entry_points={
         "console_scripts": ["asyncspider = asyncspider.__main__:main"]
