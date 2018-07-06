@@ -54,7 +54,17 @@ def run(num_threads, num_tasks, redis_url, start_url):
         Spider(loop=loop,
                num_tasks=num_tasks,
                redis_url=redis_url)
-        return mp.Process(target=loop.run_forever)
+        return (mp.Process(target=loop.run_forever), loop)
+
+    async def log_metrics():
+        redis = await aioredis.create_redis(redis_url)
+        start = await redis.scard(Spider.CRAWLED_URLS)
+        while True:
+            await asyncio.sleep(10)
+            end = await redis.scard(Spider.CRAWLED_URLS)
+            logging.info(f"Current scan rate: {(end-start) / 10} URLs/s")
+            logging.info(f"URLs scanned: {end}")
+            start = end
 
     processes = []
 
@@ -63,12 +73,14 @@ def run(num_threads, num_tasks, redis_url, start_url):
 
     # Set start URL
     if URL(start_url).is_absolute():
-        asyncio.get_event_loop().run_until_complete(add_start_url())
+        processes[0][1].run_until_complete(add_start_url())
 
-    for process in processes:
+    processes[0][1].create_task(log_metrics())
+
+    for process, _ in processes:
         process.start()
 
-    input(" -> Press enter to exit")
+    input(" -> Press enter to exit\n")
     for process in processes:
         process.terminate()
 
