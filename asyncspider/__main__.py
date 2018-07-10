@@ -22,7 +22,7 @@ from . import Spider
 logger = logging.getLogger(__name__)
 
 # Set loglevel to info
-logging.basicConfig(level=logging.INFO)
+logging.basicConfig(level=logging.DEBUG)
 
 
 @click.command()
@@ -81,7 +81,7 @@ def run(num_threads, num_tasks, redis_url, start_url):
         process.start()
 
     input(" -> Press enter to exit\n")
-    for process in processes:
+    for process, _ in processes:
         process.terminate()
 
 

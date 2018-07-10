@@ -71,12 +71,17 @@ class Spider(object):
 
     async def fetch(self, session: ClientSession, url: URL) -> ByteString:
         """ Fetches a URL """
+        logger.debug(f"fetching {url}")
         try:
             async with session.get(url, ssl=self.ssl_context) as response:
+                logger.debug(f"done fetching {url}")
                 return await response.read()
         except ssl.SSLError as se:
             logging.debug(se)
-            return b""
+        except Exception as e:
+            logging.warning(e)
+
+        return b""
 
     async def url_in_redis(self, url: str) -> bool:
         """ Checks if a URL was already crawled or it is in the queue """
